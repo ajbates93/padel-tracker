@@ -1,7 +1,11 @@
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar :title="props.title"></UDashboardNavbar>
+      <UDashboardNavbar :title="props.title">
+        <template #right>
+          <slot name="navbar-right"></slot>
+        </template>
+      </UDashboardNavbar>
       <UDashboardPanelContent>
         <slot />
       </UDashboardPanelContent>

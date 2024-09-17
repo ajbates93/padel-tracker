@@ -19,7 +19,6 @@
         </template>
       </UDashboardSidebar>
     </UDashboardPanel>
-
     <slot />
   </UDashboardLayout>
 </template>
