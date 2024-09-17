@@ -10,6 +10,11 @@ const links = [
     to: "/",
   },
   {
+    label: "Bookings",
+    icon: "i-heroicons-calendar-days",
+    to: "/bookings",
+  },
+  {
     label: "Users",
     icon: "i-heroicons-users",
     to: "/users",
