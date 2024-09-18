@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@nuxtjs/google-fonts"],
+  modules: ["@nuxt/ui", "@nuxtjs/google-fonts", "@vueuse/nuxt"],
   colorMode: {
     preference: "dark",
   },
