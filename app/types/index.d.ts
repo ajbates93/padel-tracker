@@ -10,6 +10,19 @@ export interface User {
   status: UserStatus;
 }
 
+export interface Booking {
+  id: number;
+  bookingUser: User;
+  bookingDate: Date;
+  bookingTime: string;
+  bookingDuration: BookingDuration;
+  bookingStatus: BookingStatus;
+  bookingParticipants: User[];
+}
+
+export type BookingDuration = 60 | 90;
+export type BookingStatus = "pending" | "confirmed" | "cancelled";
+
 export type Period = "daily" | "weekly" | "monthly";
 
 export interface Range {

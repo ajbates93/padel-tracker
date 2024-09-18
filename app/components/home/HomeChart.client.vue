@@ -40,41 +40,12 @@
   </UDashboardCard>
 </template>
 
-<style scoped>
-.unovis-xy-container {
-  --vis-crosshair-line-stroke-color: rgb(var(--color-primary-500));
-  --vis-crosshair-circle-stroke-color: #fff;
-
-  --vis-axis-grid-color: rgb(var(--color-gray-200));
-  --vis-axis-tick-color: rgb(var(--color-gray-200));
-  --vis-axis-tick-label-color: rgb(var(--color-gray-400));
-
-  --vis-tooltip-background-color: #fff;
-  --vis-tooltip-border-color: rgb(var(--color-gray-200));
-  --vis-tooltip-text-color: rgb(var(--color-gray-900));
-}
-
-.dark {
-  .unovis-xy-container {
-    --vis-crosshair-line-stroke-color: rgb(var(--color-primary-400));
-    --vis-crosshair-circle-stroke-color: rgb(var(--color-gray-900));
-
-    --vis-axis-grid-color: rgb(var(--color-gray-800));
-    --vis-axis-tick-color: rgb(var(--color-gray-800));
-    --vis-axis-tick-label-color: rgb(var(--color-gray-500));
-
-    --vis-tooltip-background-color: rgb(var(--color-gray-900));
-    --vis-tooltip-border-color: rgb(var(--color-gray-800));
-    --vis-tooltip-text-color: #fff;
-  }
-}
-</style>
-
 <script lang="ts" setup>
 import {
   eachDayOfInterval,
   eachWeekOfInterval,
   eachMonthOfInterval,
+  type Interval,
   format,
 } from "date-fns";
 import {
@@ -107,15 +78,16 @@ type DataRecord = {
 };
 
 const { width } = useElementSize(cardRef);
-
+type IntervalFunction = (interval: Interval) => Date[];
+const intervalFunctions: Record<string, IntervalFunction> = {
+  daily: (interval: Interval) => eachDayOfInterval(interval),
+  weekly: (interval: Interval) => eachWeekOfInterval(interval),
+  monthly: (interval: Interval) => eachMonthOfInterval(interval),
+};
 // We use `useAsyncData` here to have same random data on the client and server
 const { data } = await useAsyncData<DataRecord[]>(
   async () => {
-    const dates = {
-      daily: eachDayOfInterval,
-      weekly: eachWeekOfInterval,
-      monthly: eachMonthOfInterval,
-    }[props.period](props.range);
+    const dates = intervalFunctions[props.period!](props.range);
 
     const min = 1000;
     const max = 10000;
@@ -163,3 +135,33 @@ const xTicks = (i: number) => {
 const template = (d: DataRecord) =>
   `${formatDate(d.date)}: ${formatNumber(d.amount)}`;
 </script>
+
+<style scoped>
+.unovis-xy-container {
+  --vis-crosshair-line-stroke-color: rgb(var(--color-primary-500));
+  --vis-crosshair-circle-stroke-color: #fff;
+
+  --vis-axis-grid-color: rgb(var(--color-gray-200));
+  --vis-axis-tick-color: rgb(var(--color-gray-200));
+  --vis-axis-tick-label-color: rgb(var(--color-gray-400));
+
+  --vis-tooltip-background-color: #fff;
+  --vis-tooltip-border-color: rgb(var(--color-gray-200));
+  --vis-tooltip-text-color: rgb(var(--color-gray-900));
+}
+
+.dark {
+  .unovis-xy-container {
+    --vis-crosshair-line-stroke-color: rgb(var(--color-primary-400));
+    --vis-crosshair-circle-stroke-color: rgb(var(--color-gray-900));
+
+    --vis-axis-grid-color: rgb(var(--color-gray-800));
+    --vis-axis-tick-color: rgb(var(--color-gray-800));
+    --vis-axis-tick-label-color: rgb(var(--color-gray-500));
+
+    --vis-tooltip-background-color: rgb(var(--color-gray-900));
+    --vis-tooltip-border-color: rgb(var(--color-gray-800));
+    --vis-tooltip-text-color: #fff;
+  }
+}
+</style>

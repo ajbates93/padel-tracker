@@ -1,14 +1,13 @@
-import type { UserStatus } from "~/types";
+import type { BookingStatus } from "~/types";
+import { getAllBookings } from "../db/bookings";
 
-import { getAllUsers } from "../db/users";
-
-const users = getAllUsers();
+const bookings = getAllBookings();
 
 export default defineEventHandler(async (event) => {
   const { q, statuses, sort, order } = getQuery(event) as {
     q?: string;
-    statuses?: UserStatus[];
-    sort?: "name" | "email";
+    statuses?: BookingStatus[];
+    sort?: "bookingDate";
     order?: "asc" | "desc";
   };
 
@@ -16,22 +15,18 @@ export default defineEventHandler(async (event) => {
     setTimeout(resolve, 500);
   });
 
-  return users
-    .filter((user) => {
+  return bookings
+    .filter((booking) => {
       if (!q) return true;
 
-      return (
-        user.name.search(new RegExp(q, "i")) !== -1 ||
-        user.email.search(new RegExp(q, "i")) !== -1
-      );
+      return booking.bookingUser.name.search(new RegExp(q, "i")) !== -1;
     })
-    .filter((user) => {
+    .filter((booking) => {
       if (!statuses) return true;
-      return statuses.includes(user.status);
+      return statuses.includes(booking.bookingStatus);
     })
     .sort((a, b) => {
       if (!sort) return 0;
-      console.log(sort, order);
 
       const aValue = a[sort];
       const bValue = b[sort];
