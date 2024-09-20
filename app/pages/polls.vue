@@ -1,3 +1,3 @@
 <template>
-  <LayoutContainer title="Polls"></LayoutContainer>
+  <LayoutContainer title="Polls">polls</LayoutContainer>
 </template>
