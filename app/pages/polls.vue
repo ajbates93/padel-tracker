@@ -1,5 +1,3 @@
 <template>
-  <LayoutContainer title="Polls">
-    <div>some stuff is going here</div>
-  </LayoutContainer>
+  <LayoutContainer title="Polls"></LayoutContainer>
 </template>
