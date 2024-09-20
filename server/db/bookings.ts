@@ -2,6 +2,7 @@ import type { Booking } from "~/types";
 
 import { getUserById, getAllUsers } from "./users";
 
+const users = getAllUsers();
 const bookings: Booking[] = [
   {
     id: 1,
@@ -10,7 +11,7 @@ const bookings: Booking[] = [
     bookingTime: "09:00",
     bookingDuration: 90,
     bookingStatus: "confirmed",
-    bookingParticipants: getAllUsers().slice(0, 4),
+    bookingParticipants: users.slice(0, 4),
   },
   {
     id: 2,
@@ -19,7 +20,7 @@ const bookings: Booking[] = [
     bookingTime: "17:00",
     bookingDuration: 60,
     bookingStatus: "confirmed",
-    bookingParticipants: getAllUsers().slice(0, 4),
+    bookingParticipants: users.slice(0, 4),
   },
   {
     id: 3,
@@ -28,7 +29,7 @@ const bookings: Booking[] = [
     bookingTime: "19:00",
     bookingDuration: 60,
     bookingStatus: "confirmed",
-    bookingParticipants: getAllUsers().slice(0, 4),
+    bookingParticipants: users.slice(0, 4),
   },
   {
     id: 4,
@@ -37,7 +38,7 @@ const bookings: Booking[] = [
     bookingTime: "18:00",
     bookingDuration: 60,
     bookingStatus: "confirmed",
-    bookingParticipants: getAllUsers().slice(0, 4),
+    bookingParticipants: users.slice(0, 4),
   },
   {
     id: 5,
@@ -46,7 +47,7 @@ const bookings: Booking[] = [
     bookingTime: "18:00",
     bookingDuration: 60,
     bookingStatus: "pending",
-    bookingParticipants: getAllUsers().slice(0, 4),
+    bookingParticipants: users.slice(0, 4),
   },
 ];
 

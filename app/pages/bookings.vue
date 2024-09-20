@@ -66,7 +66,11 @@
         </div>
       </template>
 
-      <template #status-data="{ row }">
+      <template #bookingDate-data="{ row }">
+        <span>{{ new Date(row.bookingDate).toLocaleDateString() }}</span>
+      </template>
+
+      <template #bookingStatus-data="{ row }">
         <UBadge
           :label="row.bookingStatus"
           :color="
@@ -80,6 +84,21 @@
           class="capitalize"
         />
       </template>
+
+      <template #expand="{ row, expanded, toggle }">
+        <div>
+          <UTable :columns="participantColumns" :rows="row.bookingParticipants">
+            <template #name-data="{ row }">
+              <div v-if="row.name" class="flex items-center gap-3">
+                <UAvatar v-bind="row.avatar" :alt="row.name" size="xs" />
+                <span class="text-gray-900 dark:text-white font-medium">{{
+                  row.name
+                }}</span>
+              </div>
+            </template>
+          </UTable>
+        </div>
+      </template>
     </UTable>
   </LayoutContainer>
 </template>
@@ -88,13 +107,29 @@
 import type { Booking } from "~/types";
 
 const defaultColumns = [
-  { value: "id", label: "#" },
-  { value: "bookingUser", label: "Name" },
-  { value: "bookingDate", label: "Date", sortable: true },
-  { value: "bookingTime", label: "Time" },
-  { value: "bookingDuration", label: "Session Length" },
-  { value: "bookingStatus", label: "Status" },
-  { value: "bookingParticipants", label: "Participants" },
+  { key: "bookingUser", label: "Booking User" },
+  { key: "bookingDate", label: "Date", sortable: true },
+  { key: "bookingTime", label: "Time" },
+  { key: "bookingDuration", label: "Session Length" },
+  { key: "bookingStatus", label: "Status" },
+];
+
+const participantColumns = [
+  {
+    key: "name",
+    label: "Name",
+    sortable: true,
+  },
+  {
+    key: "email",
+    label: "Email",
+    sortable: true,
+  },
+  {
+    key: "status",
+    label: "Status",
+    sortable: true,
+  },
 ];
 
 const q = ref("");
@@ -120,8 +155,6 @@ const { data: bookings, pending } = await useFetch<Booking[]>("/api/bookings", {
   query,
   default: () => [],
 });
-
-console.log(bookings);
 
 const defaultStatuses = bookings.value.reduce((acc, booking) => {
   if (!acc.includes(booking.bookingStatus)) {
