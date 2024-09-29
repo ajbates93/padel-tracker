@@ -2,8 +2,6 @@ import type { UserStatus } from "~/types";
 
 import { getAllUsers } from "../db/users";
 
-const users = getAllUsers();
-
 export default defineEventHandler(async (event) => {
   const { q, statuses, sort, order } = getQuery(event) as {
     q?: string;
@@ -12,9 +10,7 @@ export default defineEventHandler(async (event) => {
     order?: "asc" | "desc";
   };
 
-  await new Promise(function (resolve) {
-    setTimeout(resolve, 500);
-  });
+  const users = await getAllUsers();
 
   return users
     .filter((user) => {
@@ -22,22 +18,23 @@ export default defineEventHandler(async (event) => {
 
       return (
         user.name.search(new RegExp(q, "i")) !== -1 ||
-        user.email.search(new RegExp(q, "i")) !== -1
+        user.email?.search(new RegExp(q, "i")) !== -1
       );
     })
     .filter((user) => {
       if (!statuses) return true;
-      return statuses.includes(user.status);
+
+      const xStatuses = statuses as string[];
+      return xStatuses.includes(user.status);
     })
     .sort((a, b) => {
       if (!sort) return 0;
-      console.log(sort, order);
 
       const aValue = a[sort];
       const bValue = b[sort];
 
-      if (aValue < bValue) return order === "asc" ? -1 : 1;
-      if (aValue > bValue) return order === "asc" ? 1 : -1;
+      if (aValue! < bValue!) return order === "asc" ? -1 : 1;
+      if (aValue! > bValue!) return order === "asc" ? 1 : -1;
       return 0;
     });
 });

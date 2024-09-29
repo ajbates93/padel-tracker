@@ -10,6 +10,13 @@ export interface User {
   status: UserStatus;
 }
 
+export interface UserInsert {
+  name: string;
+  email: string;
+  avatar?: string;
+  status: string;
+}
+
 export interface Booking {
   id: number;
   bookingUser: User;
