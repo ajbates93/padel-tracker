@@ -1,6 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  extends: ["@nuxt/ui-pro"],
   compatibilityDate: "2024-04-03",
   future: {
     compatibilityVersion: 4,
@@ -10,17 +9,8 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@nuxtjs/google-fonts",
     "@vueuse/nuxt",
-    "@nuxthub/core",
   ],
   colorMode: {
     preference: "dark",
-  },
-  hub: {
-    database: true,
-  },
-  nitro: {
-    experimental: {
-      tasks: true,
-    },
   },
 });

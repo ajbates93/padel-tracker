@@ -1,11 +1,13 @@
+const db = useDrizzle()
+
 export const getAllBookings = async () => {
-  const bookings = await useDrizzle().select().from(tables.bookings).all();
+  const bookings = await db.select().from(tables.bookings);
 
   return bookings;
 };
 
 export const getBookingById = async (id: number) => {
-  const booking = await useDrizzle()
+  const booking = await db 
     .select()
     .from(tables.bookings)
     .where(eq(tables.bookings.id, id));

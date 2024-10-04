@@ -1,12 +1,26 @@
-import { drizzle } from "drizzle-orm/d1";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from 'postgres'
 export { sql, eq, and, or } from "drizzle-orm";
 
 import * as schema from "../db/schema";
 
 export const tables = schema;
 
+let db: ReturnType<typeof drizzle> | null = null;
+
 export function useDrizzle() {
-  return drizzle(hubDatabase(), { schema });
+  if (!db) {
+
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is not defined")
+    }
+
+    const client = postgres(connectionString)
+    db = drizzle(client, { schema })
+  }
+
+  return db
 }
 
 export type User = typeof schema.users.$inferSelect;

@@ -44,7 +44,8 @@ export default defineTask({
       },
     ];
 
-    await useDrizzle().insert(tables.users).values(users);
+    const db = useDrizzle()
+    await db.insert(tables.users).values(users);
     return { result: "success" };
   },
 });

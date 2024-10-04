@@ -1,39 +1,39 @@
 import { sql } from "drizzle-orm";
-import { text, integer, sqliteTable } from "drizzle-orm/sqlite-core";
+import { pgTable, text, integer, varchar, timestamp } from "drizzle-orm/pg-core";
 
-export const users = sqliteTable("users", {
+export const users = pgTable("users", {
   id: integer("id").notNull().primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email").unique(),
   avatar: text("avatar"),
-  status: text("status").notNull(),
-  created_at: integer("created_at", { mode: "timestamp" })
+  status: varchar("status").notNull(),
+  created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updated_at: integer("updated_at", { mode: "timestamp" })
+  updated_at: timestamp("updated_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  deleted_at: integer("deleted_at", { mode: "timestamp" }),
+  deleted_at: timestamp("deleted_at"),
 });
 
-export const bookings = sqliteTable("bookings", {
+export const bookings = pgTable("bookings", {
   id: integer("id").notNull().primaryKey({ autoIncrement: true }),
   created_id: integer("creator_id")
     .notNull()
     .references(() => users.id),
-  date: integer("date", { mode: "timestamp" }).notNull(),
+  date: timestamp("date").notNull(),
   time: text("time").notNull(),
   duration: integer("duration").notNull(),
-  status: text("status").notNull(),
-  created_at: integer("created_at", { mode: "timestamp" })
+  status: varchar("status").notNull(),
+  created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updated_at: integer("updated_at", { mode: "timestamp" })
+  updated_at: timestamp("updated_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
 });
 
-export const bookingParticipants = sqliteTable("booking_participants", {
+export const bookingParticipants = pgTable("booking_participants", {
   id: integer("id").notNull().primaryKey({ autoIncrement: true }),
   booking_id: integer("booking_id")
     .notNull()
@@ -41,8 +41,8 @@ export const bookingParticipants = sqliteTable("booking_participants", {
   user_id: integer("user_id")
     .notNull()
     .references(() => users.id),
-  role: text("role").notNull(), // e.g., 'creator', 'participant'
-  created_at: integer("created_at", { mode: "timestamp" })
+  role: varchar("role").notNull(), // e.g., 'creator', 'participant'
+  created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
 });
