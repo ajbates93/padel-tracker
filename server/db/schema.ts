@@ -1,12 +1,22 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, integer, varchar, timestamp } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  integer,
+  varchar,
+  timestamp,
+  uuid,
+  serial,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
-  id: integer("id").notNull().primaryKey({ autoIncrement: true }),
+  id: uuid("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text("name").notNull(),
   email: text("email").unique(),
   avatar: text("avatar"),
-  status: varchar("status").notNull(),
+  status: varchar("status").notNull().default("inactive"),
   created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
@@ -17,8 +27,8 @@ export const users = pgTable("users", {
 });
 
 export const bookings = pgTable("bookings", {
-  id: integer("id").notNull().primaryKey({ autoIncrement: true }),
-  created_id: integer("creator_id")
+  id: serial("id").primaryKey(),
+  user_id: uuid("user_id")
     .notNull()
     .references(() => users.id),
   date: timestamp("date").notNull(),
@@ -34,11 +44,11 @@ export const bookings = pgTable("bookings", {
 });
 
 export const bookingParticipants = pgTable("booking_participants", {
-  id: integer("id").notNull().primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   booking_id: integer("booking_id")
     .notNull()
     .references(() => bookings.id),
-  user_id: integer("user_id")
+  user_id: uuid("user_id")
     .notNull()
     .references(() => users.id),
   role: varchar("role").notNull(), // e.g., 'creator', 'participant'

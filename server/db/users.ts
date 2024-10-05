@@ -1,5 +1,4 @@
-
-const db = useDrizzle()
+const db = useDrizzle();
 
 export const getAllUsers = async () => {
   const users = await db.select().from(tables.users);
@@ -7,7 +6,7 @@ export const getAllUsers = async () => {
   return users;
 };
 
-export const getUserById = async (id: number) => {
+export const getUserById = async (id: string) => {
   const user = await db
     .select()
     .from(tables.users)
@@ -16,11 +15,12 @@ export const getUserById = async (id: number) => {
   return user;
 };
 
-export const createUser = async (user: UserInsert) => {
-  const newUser = await db 
-    .insert(tables.users)
-    .values(user)
-    .returning()
+export const createUser = async (user: {
+  name: string;
+  email: string;
+  avatar: string;
+}) => {
+  const newUser = await db.insert(tables.users).values(user).returning();
 
   return newUser;
 };

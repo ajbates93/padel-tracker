@@ -19,6 +19,9 @@
         </template>
       </UDashboardSidebar>
     </UDashboardPanel>
-    <slot />
+    <NuxtPage />
   </UDashboardLayout>
 </template>
+
+<script setup lang="ts">
+</script>

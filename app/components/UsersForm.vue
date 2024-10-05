@@ -18,6 +18,10 @@
       />
     </UFormGroup>
 
+    <UFormGroup label="Avatar" name="avatar">
+      <UInput v-model="state.avatar" placeholder="https://myavatarpath.com" />
+    </UFormGroup>
+
     <div class="flex justify-end gap-3">
       <UButton
         label="Cancel"
@@ -25,7 +29,7 @@
         variant="ghost"
         @click="emit('close')"
       />
-      <UButton type="submit" label="Save" color="black" />
+      <UButton type="submit" label="Save" color="black" :loading="loading" />
     </div>
   </UForm>
 </template>
@@ -35,22 +39,49 @@ import type { FormError, FormSubmitEvent } from "#ui/types";
 
 const emit = defineEmits(["close"]);
 
-const state = reactive({
-  name: undefined,
-  email: undefined,
-});
+type FormState = {
+  name: string;
+  email: string;
+  avatar: string;
+};
 
-const validate = (state: any): FormError[] => {
+const state = reactive<FormState>({
+  name: "",
+  email: "",
+  avatar: "",
+});
+const loading = ref(false);
+
+const validate = (state: FormState): FormError[] => {
   const errors = [];
   if (!state.name)
     errors.push({ path: "name", message: "Please enter a name." });
   if (!state.email)
     errors.push({ path: "email", message: "Please enter an email." });
+  if (!state.avatar)
+    errors.push({ path: "name", message: "Please enter an Avatar URL." });
   return errors;
 };
 
 async function onSubmit(event: FormSubmitEvent<any>) {
-  console.log(event.data);
+  try {
+    loading.value = true;
+
+    const response = await $fetch("/api/users", {
+      method: "POST",
+      body: JSON.stringify(event.data),
+    });
+
+    if (response.success) {
+      emit("close");
+    } else {
+      console.error(response);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    loading.value = false;
+  }
 
   emit("close");
 }

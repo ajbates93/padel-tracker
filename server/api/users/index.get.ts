@@ -1,6 +1,6 @@
 import type { UserStatus } from "~/types";
 
-import { getAllUsers } from "../db/users";
+import { getAllUsers } from "../../db/users";
 
 export default defineEventHandler(async (event) => {
   const { q, statuses, sort, order } = getQuery(event) as {

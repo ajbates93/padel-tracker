@@ -17,6 +17,7 @@
     "@unovis/ts": "^1.4.3-beta.0",
     "@unovis/vue": "^1.4.3-beta.0",
     "@vueuse/nuxt": "latest",
+    "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.33.0",
     "nuxt": "^3.13.0",
