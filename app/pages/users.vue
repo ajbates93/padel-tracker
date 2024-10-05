@@ -122,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { User } from "~/types";
+import type { ApiResponse, User } from "~/types";
 
 const defaultColumns = [
   {
@@ -176,11 +176,16 @@ const query = computed(() => ({
 }));
 
 const loadData = async () => {
-  const { data: usersFromDB } = await useFetch<User[]>("/api/users", {
-    query,
-    default: () => [],
-  });
-  users.value = usersFromDB.value;
+  loading.value = true;
+  const { data: usersFromDB } = await useFetch<ApiResponse<User[]>>(
+    "/api/users",
+    {
+      query,
+    },
+  );
+  if (usersFromDB.value?.success && usersFromDB.value?.data)
+    users.value = usersFromDB.value.data;
+  loading.value = false;
 };
 
 const defaultStatuses = users.value.reduce((acc, user) => {

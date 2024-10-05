@@ -47,36 +47,32 @@
       v-model:sort="sort"
       :rows="bookings"
       :columns="columns"
-      :loading="pending"
+      :loading="loading"
       sort-mode="manual"
       class="w-full"
       :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
       @select="onSelect"
     >
-      <template #bookingUser-data="{ row }">
-        <div v-if="row.bookingUser" class="flex items-center gap-3">
-          <UAvatar
-            v-bind="row.bookingUser.avatar"
-            :alt="row.bookingUser.name"
-            size="xs"
-          />
+      <template #user_id-data="{ row }">
+        <div v-if="row.user" class="flex items-center gap-3">
+          <UAvatar v-bind="row.user.avatar" :alt="row.user.name" size="xs" />
           <span class="text-gray-900 dark:text-white font-medium">{{
-            row.bookingUser.name
+            row.user.name
           }}</span>
         </div>
       </template>
 
-      <template #bookingDate-data="{ row }">
-        <span>{{ new Date(row.bookingDate).toLocaleDateString() }}</span>
+      <template #date-data="{ row }">
+        <span>{{ new Date(row.date).toLocaleDateString() }}</span>
       </template>
 
-      <template #bookingStatus-data="{ row }">
+      <template #status-data="{ row }">
         <UBadge
-          :label="row.bookingStatus"
+          :label="row.status"
           :color="
-            row.bookingStatus === 'confirmed'
+            row.status === 'confirmed'
               ? 'green'
-              : row.bookingStatus === 'pending'
+              : row.status === 'pending'
                 ? 'orange'
                 : 'red'
           "
@@ -104,14 +100,14 @@
 </template>
 
 <script lang="ts" setup>
-import type { Booking } from "~/types";
+import type { ApiResponse, Booking } from "~/types";
 
 const defaultColumns = [
-  { key: "bookingUser", label: "Booking User" },
-  { key: "bookingDate", label: "Date", sortable: true },
-  { key: "bookingTime", label: "Time" },
-  { key: "bookingDuration", label: "Session Length" },
-  { key: "bookingStatus", label: "Status" },
+  { key: "user", label: "Booking User" },
+  { key: "date", label: "Date", sortable: true },
+  { key: "time", label: "Time" },
+  { key: "duration", label: "Session Length" },
+  { key: "status", label: "Status" },
 ];
 
 const participantColumns = [
@@ -133,10 +129,15 @@ const participantColumns = [
 ];
 
 const q = ref("");
+const loading = ref(false);
+const bookings = ref<Booking[]>([]);
 const selected = ref<Booking[]>([]);
 const selectedColumns = ref(defaultColumns);
 const selectedStatuses = ref<string[]>([]);
-const sort = ref({ column: "bookingDate", direction: "desc" });
+const sort = ref<{ column: string; direction: "desc" | "asc" }>({
+  column: "date",
+  direction: "desc",
+});
 const input = ref<{ input: HTMLInputElement }>();
 const isNewBookingModalOpen = ref(false);
 
@@ -151,14 +152,22 @@ const query = computed(() => ({
   order: sort.value.direction,
 }));
 
-const { data: bookings, pending } = await useFetch<Booking[]>("/api/bookings", {
-  query,
-  default: () => [],
-});
+const loadData = async () => {
+  loading.value = true;
+  const { data: bookingsFromDb } = await useFetch<ApiResponse<Booking[]>>(
+    "/api/bookings",
+    {
+      query,
+    },
+  );
+  if (bookingsFromDb.value?.success && bookingsFromDb.value?.data)
+    bookings.value = bookingsFromDb.value.data;
+  loading.value = false;
+};
 
 const defaultStatuses = bookings.value.reduce((acc, booking) => {
-  if (!acc.includes(booking.bookingStatus)) {
-    acc.push(booking.bookingStatus);
+  if (!acc.includes(booking.status)) {
+    acc.push(booking.status);
   }
   return acc;
 }, [] as string[]);
@@ -171,6 +180,8 @@ function onSelect(row: Booking) {
     selected.value.splice(index, 1);
   }
 }
+
+loadData();
 
 defineShortcuts({
   "/": () => input.value?.input?.focus(),

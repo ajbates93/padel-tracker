@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
 
   const users = await getAllUsers();
 
-  return users
+  const filtered = users
     .filter((user) => {
       if (!q) return true;
 
@@ -37,4 +37,11 @@ export default defineEventHandler(async (event) => {
       if (aValue! > bValue!) return order === "asc" ? 1 : -1;
       return 0;
     });
+
+  const response = {
+    success: true,
+    data: filtered,
+  };
+
+  return response;
 });

@@ -15,12 +15,14 @@ export type User = {
 
 export interface Booking {
   id: number;
-  bookingUser: User;
-  bookingDate: Date;
-  bookingTime: string;
-  bookingDuration: BookingDuration;
-  bookingStatus: BookingStatus;
-  bookingParticipants: User[];
+  date: Date;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+  user_id: string;
+  user: User;
+  time: string;
+  duration: number;
 }
 
 export type BookingDuration = 60 | 90;
@@ -32,3 +34,8 @@ export interface Range {
   start: Date;
   end: Date;
 }
+
+export type ApiResponse<T> = {
+  success: boolean;
+  data: T;
+};
