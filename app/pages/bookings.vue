@@ -19,7 +19,7 @@
         label="New booking"
         trailing-icon="i-heroicons-plus"
         color="gray"
-        @click="isNewBookingModalOpen = true"
+        @click="isBookingModalOpen = true"
       />
     </template>
     <UDashboardToolbar>
@@ -35,12 +35,12 @@
       </template>
     </UDashboardToolbar>
     <UDashboardModal
-      v-model="isNewBookingModalOpen"
+      v-model="isBookingModalOpen"
       title="New booking"
       description="Add a new booking to your database"
       :ui="{ width: 'sm:max-w-md' }"
     >
-      <!-- <UsersForm @close="isNewBookingModalOpen = false" /> -->
+      <BookingsForm @close="isBookingModalOpen = false" :is-editing="false" />
     </UDashboardModal>
     <UTable
       v-model="selected"
@@ -139,7 +139,7 @@ const sort = ref<{ column: string; direction: "desc" | "asc" }>({
   direction: "desc",
 });
 const input = ref<{ input: HTMLInputElement }>();
-const isNewBookingModalOpen = ref(false);
+const isBookingModalOpen = ref(false);
 
 const columns = computed(() =>
   defaultColumns.filter((column) => selectedColumns.value.includes(column)),
