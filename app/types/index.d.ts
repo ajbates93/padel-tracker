@@ -2,13 +2,16 @@ import type { Avatar } from "#ui/types";
 
 export type UserStatus = "active" | "inactive";
 
-export interface User {
-  id: number;
+export type User = {
+  id: string;
   name: string;
   email: string;
-  avatar?: Avatar;
-  status: UserStatus;
-}
+  avatar: string | null;
+  status: string;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+};
 
 export interface Booking {
   id: number;

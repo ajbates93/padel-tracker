@@ -1,3 +1,5 @@
+import { users } from "./schema";
+
 const db = useDrizzle();
 
 export const getAllUsers = async () => {
@@ -23,4 +25,17 @@ export const createUser = async (user: {
   const newUser = await db.insert(tables.users).values(user).returning();
 
   return newUser;
+};
+
+export const updateUser = async (
+  id: string,
+  updateData: Partial<typeof users.$inferInsert>,
+) => {
+  const result = await db
+    .update(users)
+    .set(updateData)
+    .where(eq(users.id, id))
+    .returning();
+
+  return result[0] || null;
 };

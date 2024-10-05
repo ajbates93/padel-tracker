@@ -19,7 +19,14 @@
         label="New user"
         trailing-icon="i-heroicons-plus"
         color="gray"
-        @click="isNewUserModalOpen = true"
+        @click="isUserModalOpen = true"
+      />
+      <UButton
+        v-if="selected.length === 1"
+        label="Edit user"
+        trailing-icon="i-heroicons-pencil"
+        color="green"
+        @click="isEditingUserModalOpen = true"
       />
     </template>
     <UDashboardToolbar>
@@ -48,19 +55,38 @@
     </UDashboardToolbar>
 
     <UDashboardModal
-      v-model="isNewUserModalOpen"
+      v-model="isUserModalOpen"
       title="New user"
       description="Add a new user to your database"
-      :ui="{ width: 'sm:max-w-md' }"
+      :ui="{ width: 'sm:max-w-lg' }"
     >
-      <UsersForm @close="isNewUserModalOpen = false" />
+      <UsersForm @close="isUserModalOpen = false" :is-editing="false" />
+    </UDashboardModal>
+    <UDashboardModal
+      v-model="isEditingUserModalOpen"
+      title="Edit user"
+      description="Edit a user in your database"
+      :ui="{ width: 'sm:max-w-lg' }"
+    >
+      <UsersForm
+        @close="isEditingUserModalOpen = false"
+        @reload-data="loadData"
+        :is-editing="true"
+        :editing-user="{
+          id: selected[0]?.id,
+          name: selected[0]?.name,
+          email: selected[0]?.email,
+          avatar: selected[0]?.avatar ?? '',
+          status: selected[0]?.status ?? '',
+        }"
+      />
     </UDashboardModal>
     <UTable
       v-model="selected"
       v-model:sort="sort"
       :rows="users"
       :columns="columns"
-      :loading="pending"
+      :loading="loading"
       sort-mode="manual"
       class="w-full"
       :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
@@ -68,7 +94,7 @@
     >
       <template #name-data="{ row }">
         <div class="flex items-center gap-3">
-          <UAvatar v-bind="row.avatar" :alt="row.name" size="xs" />
+          <UAvatar :src="row.avatar" :alt="row.name" size="xs" />
           <span class="text-gray-900 dark:text-white font-medium">{{
             row.name
           }}</span>
@@ -78,16 +104,18 @@
       <template #status-data="{ row }">
         <UBadge
           :label="row.status"
-          :color="
-            row.status === 'subscribed'
-              ? 'green'
-              : row.status === 'bounced'
-                ? 'orange'
-                : 'red'
-          "
+          :color="row.status === 'active' ? 'green' : 'red'"
           variant="subtle"
           class="capitalize"
         />
+      </template>
+
+      <template #created_at-data="{ row }">
+        <span>{{ new Date(row.created_at).toLocaleString() }}</span>
+      </template>
+
+      <template #updated_at-data="{ row }">
+        <span>{{ new Date(row.updated_at).toLocaleString() }}</span>
       </template>
     </UTable>
   </LayoutContainer>
@@ -97,10 +125,6 @@
 import type { User } from "~/types";
 
 const defaultColumns = [
-  {
-    key: "id",
-    label: "#",
-  },
   {
     key: "name",
     label: "Name",
@@ -112,6 +136,17 @@ const defaultColumns = [
     sortable: true,
   },
   {
+    key: "created_at",
+    label: "Created At",
+    sortable: true,
+  },
+  {
+    key: "updated_at",
+    label: "Last Updated",
+    sortable: true,
+  },
+
+  {
     key: "status",
     label: "Status",
     sortable: true,
@@ -119,12 +154,15 @@ const defaultColumns = [
 ];
 
 const q = ref("");
+const loading = ref(false);
+const users = ref<User[]>([]);
 const selected = ref<User[]>([]);
 const selectedColumns = ref(defaultColumns);
 const selectedStatuses = ref<string[]>([]);
 const sort = ref({ column: "id", direction: "asc" as const });
 const input = ref<{ input: HTMLInputElement }>();
-const isNewUserModalOpen = ref(false);
+const isUserModalOpen = ref(false);
+const isEditingUserModalOpen = ref(false);
 
 const columns = computed(() =>
   defaultColumns.filter((column) => selectedColumns.value.includes(column)),
@@ -137,10 +175,13 @@ const query = computed(() => ({
   order: sort.value.direction,
 }));
 
-const { data: users, pending } = await useFetch<User[]>("/api/users", {
-  query,
-  default: () => [],
-});
+const loadData = async () => {
+  const { data: usersFromDB } = await useFetch<User[]>("/api/users", {
+    query,
+    default: () => [],
+  });
+  users.value = usersFromDB.value;
+};
 
 const defaultStatuses = users.value.reduce((acc, user) => {
   if (!acc.includes(user.status)) {
@@ -157,6 +198,8 @@ function onSelect(row: User) {
     selected.value.splice(index, 1);
   }
 }
+
+loadData();
 
 defineShortcuts({
   "/": () => {
