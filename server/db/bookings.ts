@@ -64,6 +64,22 @@ export const getAllBookings = async (params: {
   return response;
 };
 
+export const createBooking = async (booking: {
+  date: Date;
+  time: string;
+  duration: number;
+  status: string;
+  user_id: string;
+}) => {
+  console.log(booking);
+  const newBooking = await db
+    .insert(tables.bookings)
+    .values(booking)
+    .returning();
+
+  return newBooking;
+};
+
 // Helper function for pagination
 function withPagination<T extends PgSelect>(
   qb: T,
