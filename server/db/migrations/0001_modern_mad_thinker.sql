@@ -1,0 +1,1 @@
+ALTER TABLE "booking_participants" ADD COLUMN "paid" boolean DEFAULT false;

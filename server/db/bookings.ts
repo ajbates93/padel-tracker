@@ -1,9 +1,12 @@
 import type { BookingStatus } from "~/types";
 import type { PgSelect } from "drizzle-orm/pg-core";
-import { bookings, users } from "./schema";
-import { and, eq, desc, asc, ilike } from "drizzle-orm";
+import { bookingParticipants, bookings, users } from "./schema";
+import { and, eq, desc, asc, ilike, aliasedTable } from "drizzle-orm";
 
 const db = useDrizzle();
+
+// Alias for the users table
+const participantUsers = aliasedTable(users, "participant_users");
 
 export const getAllBookings = async (params: {
   q?: string;
@@ -17,15 +20,38 @@ export const getAllBookings = async (params: {
 
   let query = db
     .select({
-      booking: bookings,
-      user: {
+      booking: {
+        id: bookings.id,
+        date: bookings.date,
+        time: bookings.time,
+        duration: bookings.duration,
+        status: bookings.status,
+      },
+      owner: {
         id: users.id,
         name: users.name,
         avatar: users.avatar,
       },
+      participant: {
+        id: bookingParticipants.id,
+        paid: bookingParticipants.paid,
+      },
+      participantUser: {
+        id: participantUsers.id,
+        name: participantUsers.name,
+        avatar: participantUsers.avatar,
+      },
     })
     .from(bookings)
     .leftJoin(users, eq(bookings.user_id, users.id))
+    .leftJoin(
+      bookingParticipants,
+      eq(bookings.id, bookingParticipants.booking_id),
+    )
+    .leftJoin(
+      participantUsers,
+      eq(bookingParticipants.user_id, participantUsers.id),
+    )
     .$dynamic();
 
   // Apply search filter
@@ -57,13 +83,61 @@ export const getAllBookings = async (params: {
 
   const results = await query;
 
-  const response = results.map(({ booking, user }) => ({
-    ...booking,
-    user,
-  }));
+  const response = mapQueryResultToResponse(results);
 
-  return response;
+  return {
+    success: true,
+    data: response,
+  };
 };
+
+type QueryResult = {
+  booking: {
+    id: number;
+    date: Date;
+    time: string;
+    duration: number;
+    status: string;
+  };
+  owner: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  } | null;
+  participant: {
+    id: number;
+    paid: boolean | null;
+  } | null;
+  participantUser: {
+    id: string;
+    name: string;
+    avatar: string | null;
+  } | null;
+};
+
+function mapQueryResultToResponse(results: QueryResult[]) {
+  const bookingsMap = new Map();
+
+  results.forEach((row) => {
+    if (!bookingsMap.has(row.booking.id)) {
+      bookingsMap.set(row.booking.id, {
+        ...row.booking,
+        owner: row.owner || null,
+        participants: [],
+      });
+    }
+
+    if (row.participant && row.participantUser) {
+      bookingsMap.get(row.booking.id).participants.push({
+        id: row.participant.id,
+        paid: row.participant.paid,
+        user: row.participantUser,
+      });
+    }
+  });
+
+  return Array.from(bookingsMap.values());
+}
 
 export const createBooking = async (bookingInput: {
   date: Date | string;

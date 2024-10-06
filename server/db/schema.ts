@@ -7,6 +7,7 @@ import {
   timestamp,
   uuid,
   serial,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -41,6 +42,7 @@ export const bookings = pgTable("bookings", {
   updated_at: timestamp("updated_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
+  deleted_at: timestamp("deleted_at"),
 });
 
 export const bookingParticipants = pgTable("booking_participants", {
@@ -51,8 +53,12 @@ export const bookingParticipants = pgTable("booking_participants", {
   user_id: uuid("user_id")
     .notNull()
     .references(() => users.id),
-  role: varchar("role").notNull(), // e.g., 'creator', 'participant'
+  paid: boolean("paid").default(false),
   created_at: timestamp("created_at")
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
+  updated_at: timestamp("updated_at")
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  deleted_at: timestamp("deleted_at"),
 });

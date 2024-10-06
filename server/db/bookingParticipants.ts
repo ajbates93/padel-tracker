@@ -1,20 +1,29 @@
-export const getAllBookingParticipants = async () => {
-  const bookingParticipants = await useDrizzle()
-    .select()
-    .from(tables.bookingParticipants)
-    .all();
+import { bookingParticipants } from "./schema";
 
-  return bookingParticipants;
-};
+const db = useDrizzle();
 
-export const createBookingParticipant = async (
-  bookingParticipant: BookingParticipantInsert,
-) => {
-  const newBookingParticipant = await useDrizzle()
+export const createBookingParticipant = async (bookingParticipantInput: {
+  user_id: string;
+  booking_id: number;
+  paid: boolean;
+}) => {
+  const newBookingParticipant = await db
     .insert(tables.bookingParticipants)
-    .values(bookingParticipant)
-    .returning()
-    .get();
+    .values(bookingParticipantInput)
+    .returning();
 
   return newBookingParticipant;
+};
+
+export const updateBookingParticipant = async (
+  id: number,
+  updateData: Partial<typeof bookingParticipants.$inferInsert>,
+) => {
+  const result = await db
+    .update(bookingParticipants)
+    .set(updateData)
+    .where(eq(bookingParticipants.id, id))
+    .returning();
+
+  return result[0] || null;
 };
