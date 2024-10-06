@@ -53,9 +53,9 @@
       :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
       @select="onSelect"
     >
-      <template #user_id-data="{ row }">
+      <template #user-data="{ row }">
         <div v-if="row.user" class="flex items-center gap-3">
-          <UAvatar v-bind="row.user.avatar" :alt="row.user.name" size="xs" />
+          <UAvatar :src="row.user.avatar" :alt="row.user.name" size="xs" />
           <span class="text-gray-900 dark:text-white font-medium">{{
             row.user.name
           }}</span>

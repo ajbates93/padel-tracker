@@ -21,6 +21,7 @@ export const getAllBookings = async (params: {
       user: {
         id: users.id,
         name: users.name,
+        avatar: users.avatar,
       },
     })
     .from(bookings)
@@ -64,17 +65,31 @@ export const getAllBookings = async (params: {
   return response;
 };
 
-export const createBooking = async (booking: {
-  date: Date;
+export const createBooking = async (bookingInput: {
+  date: Date | string;
   time: string;
   duration: number;
   status: string;
   user_id: string;
 }) => {
-  console.log(booking);
+  // Parse the data if it's a string
+  const parsedDate =
+    bookingInput.date instanceof Date
+      ? bookingInput.date
+      : new Date(bookingInput.date);
+
+  if (isNaN(parsedDate.getTime())) {
+    throw new Error("Invalid date provided");
+  }
+
+  const bookingData = {
+    ...bookingInput,
+    date: parsedDate,
+  };
+
   const newBooking = await db
     .insert(tables.bookings)
-    .values(booking)
+    .values(bookingData)
     .returning();
 
   return newBooking;
