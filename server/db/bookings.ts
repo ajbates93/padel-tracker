@@ -30,7 +30,12 @@ export const getAllBookings = async (params: {
       owner: {
         id: users.id,
         name: users.name,
+        email: users.email,
         avatar: users.avatar,
+        status: users.status,
+        created_at: users.created_at,
+        updated_at: users.updated_at,
+        deleted_at: users.deleted_at,
       },
       participant: {
         id: bookingParticipants.id,
@@ -40,6 +45,11 @@ export const getAllBookings = async (params: {
         id: participantUsers.id,
         name: participantUsers.name,
         avatar: participantUsers.avatar,
+        email: participantUsers.email,
+        status: participantUsers.status,
+        created_at: participantUsers.created_at,
+        updated_at: participantUsers.updated_at,
+        deleted_at: participantUsers.deleted_at,
       },
     })
     .from(bookings)
@@ -96,20 +106,12 @@ type QueryResult = {
     duration: number;
     status: string;
   };
-  owner: {
-    id: string;
-    name: string;
-    avatar: string | null;
-  } | null;
+  owner: User | null;
   participant: {
     id: number;
     paid: boolean | null;
   } | null;
-  participantUser: {
-    id: string;
-    name: string;
-    avatar: string | null;
-  } | null;
+  participantUser: User | null;
 };
 
 function mapQueryResultToResponse(results: QueryResult[]) {

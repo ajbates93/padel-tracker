@@ -55,6 +55,24 @@
         :is-editing="false"
       />
     </UDashboardModal>
+    <UDashboardModal
+      v-model="isEditingBookingParticipantModalOpen"
+      title="Edit participant"
+      description="Edit the selected user or change whether the user has paid."
+      :ui="{ width: 'sm:max-w-md' }"
+    >
+      <BookingsParticipantsForm
+        :bookingId="selected[0]!.id"
+        @close="isBookingParticipantModalOpen = false"
+        @reload-data="loadData"
+        :is-editing="true"
+        :editing-booking-participant="{
+          id: selectedParticipant!.id,
+          user_id: selectedParticipant!.userId,
+          paid: selectedParticipant!.paid,
+        }"
+      />
+    </UDashboardModal>
     <UTable
       v-model="selected"
       v-model:sort="sort"
@@ -97,7 +115,7 @@
       <template #expand="{ row, expanded, toggle }">
         <div class="pb-5">
           <UTable :columns="participantColumns" :rows="row.participants">
-            <template #user-data="{ row }">
+            <template #name-data="{ row }">
               <div v-if="row.user" class="flex items-center gap-3">
                 <UAvatar
                   :src="row.user.avatar"
@@ -109,9 +127,28 @@
                 }}</span>
               </div>
             </template>
+
+            <template #email-data="{ row }">
+              <div v-if="row.user.email">{{ row.user.email }}</div>
+            </template>
+
+            <template #paid-data="{ row }">
+              <div>{{ row.paid ? "Yes" : "No" }}</div>
+            </template>
+
+            <template #actions-data="{ row }">
+              <UDropdown :items="participantActions(row)">
+                <UButton
+                  color="gray"
+                  variant="ghost"
+                  icon="i-heroicons-ellipsis-horizontal-20-solid"
+                />
+              </UDropdown>
+            </template>
           </UTable>
           <template v-if="row.participants.length < 4">
             <UButton
+              class="mt-5"
               label="Add participant"
               trailing-icon="i-heroicons-plus"
               color="gray"
@@ -139,24 +176,55 @@ const participantColumns = [
   {
     key: "name",
     label: "Name",
-    sortable: true,
+    sortable: false,
   },
   {
     key: "email",
     label: "Email",
-    sortable: true,
+    sortable: false,
   },
   {
-    key: "status",
-    label: "Status",
-    sortable: true,
+    key: "paid",
+    label: "Paid",
+    sortable: false,
   },
+  {
+    key: "actions",
+    label: "Actions",
+    sortable: false,
+  },
+];
+
+const participantActions = (row: any) => [
+  [
+    {
+      label: "Edit",
+      icon: "i-heroicons-pencil-20-solid",
+      onClick: () => {
+        handleEditParticipant(row.id, row.user.id, row.paid);
+      },
+    },
+  ],
+  [
+    {
+      label: "Remove",
+      icon: "i-heroicons-trash-20-solid",
+      onClick: () => {
+        isRemoveBookingParticipantModalOpen.value = true;
+      },
+    },
+  ],
 ];
 
 const q = ref("");
 const loading = ref(false);
 const bookings = ref<Booking[]>([]);
 const selected = ref<Booking[]>([]);
+const selectedParticipant = ref<{
+  id: number;
+  userId: string;
+  paid: boolean;
+} | null>(null);
 const selectedColumns = ref(defaultColumns);
 const selectedStatuses = ref<string[]>([]);
 const sort = ref<{ column: string; direction: "desc" | "asc" }>({
@@ -166,6 +234,8 @@ const sort = ref<{ column: string; direction: "desc" | "asc" }>({
 const input = ref<{ input: HTMLInputElement }>();
 const isBookingModalOpen = ref(false);
 const isBookingParticipantModalOpen = ref(false);
+const isEditingBookingParticipantModalOpen = ref(false);
+const isRemoveBookingParticipantModalOpen = ref(false);
 
 const columns = computed(() =>
   defaultColumns.filter((column) => selectedColumns.value.includes(column)),
@@ -187,7 +257,6 @@ const loadData = async () => {
     },
   );
   if (bookingsFromDb.value?.success && bookingsFromDb.value?.data) {
-    console.log(bookingsFromDb.value);
     bookings.value = bookingsFromDb.value.data;
   }
 
@@ -208,6 +277,19 @@ function onSelect(row: Booking) {
   } else {
     selected.value.splice(index, 1);
   }
+}
+
+function handleEditParticipant(
+  participantId: number,
+  userId: string,
+  paid: boolean,
+) {
+  selectedParticipant.value = {
+    id: participantId,
+    userId: userId,
+    paid,
+  };
+  isBookingParticipantModalOpen.value = true;
 }
 
 loadData();

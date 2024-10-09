@@ -15,7 +15,7 @@
       <UDashboardSidebar>
         <Navigation />
         <template #footer>
-          <UserDropdown />
+          <UsersDropdown />
         </template>
       </UDashboardSidebar>
     </UDashboardPanel>
@@ -23,5 +23,4 @@
   </UDashboardLayout>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
