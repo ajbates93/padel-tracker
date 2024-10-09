@@ -42,6 +42,19 @@
     >
       <BookingsForm @close="isBookingModalOpen = false" :is-editing="false" />
     </UDashboardModal>
+    <UDashboardModal
+      v-model="isBookingParticipantModalOpen"
+      title="Add participant"
+      description="Add a participant to your booking. You can add up to 4 participants."
+      :ui="{ width: 'sm:max-w-md' }"
+    >
+      <BookingsParticipantsForm
+        v-if="selected.length > 0"
+        :bookingId="selected[0]!.id"
+        @close="isBookingParticipantModalOpen = false"
+        :is-editing="false"
+      />
+    </UDashboardModal>
     <UTable
       v-model="selected"
       v-model:sort="sort"
@@ -53,11 +66,11 @@
       :ui="{ divide: 'divide-gray-200 dark:divide-gray-800' }"
       @select="onSelect"
     >
-      <template #user-data="{ row }">
-        <div v-if="row.user" class="flex items-center gap-3">
-          <UAvatar :src="row.user.avatar" :alt="row.user.name" size="xs" />
+      <template #owner-data="{ row }">
+        <div v-if="row.owner" class="flex items-center gap-3">
+          <UAvatar :src="row.owner.avatar" :alt="row.owner.name" size="xs" />
           <span class="text-gray-900 dark:text-white font-medium">{{
-            row.user.name
+            row.owner.name
           }}</span>
         </div>
       </template>
@@ -82,17 +95,29 @@
       </template>
 
       <template #expand="{ row, expanded, toggle }">
-        <div>
-          <UTable :columns="participantColumns" :rows="row.bookingParticipants">
-            <template #name-data="{ row }">
-              <div v-if="row.name" class="flex items-center gap-3">
-                <UAvatar v-bind="row.avatar" :alt="row.name" size="xs" />
+        <div class="pb-5">
+          <UTable :columns="participantColumns" :rows="row.participants">
+            <template #user-data="{ row }">
+              <div v-if="row.user" class="flex items-center gap-3">
+                <UAvatar
+                  :src="row.user.avatar"
+                  :alt="row.user.name"
+                  size="xs"
+                />
                 <span class="text-gray-900 dark:text-white font-medium">{{
-                  row.name
+                  row.user.name
                 }}</span>
               </div>
             </template>
           </UTable>
+          <template v-if="row.participants.length < 4">
+            <UButton
+              label="Add participant"
+              trailing-icon="i-heroicons-plus"
+              color="gray"
+              @click="isBookingParticipantModalOpen = true"
+            />
+          </template>
         </div>
       </template>
     </UTable>
@@ -103,7 +128,7 @@
 import type { ApiResponse, Booking } from "~/types";
 
 const defaultColumns = [
-  { key: "user", label: "Booking User" },
+  { key: "owner", label: "Booking User" },
   { key: "date", label: "Date", sortable: true },
   { key: "time", label: "Time" },
   { key: "duration", label: "Session Length" },
@@ -136,10 +161,11 @@ const selectedColumns = ref(defaultColumns);
 const selectedStatuses = ref<string[]>([]);
 const sort = ref<{ column: string; direction: "desc" | "asc" }>({
   column: "date",
-  direction: "desc",
+  direction: "asc",
 });
 const input = ref<{ input: HTMLInputElement }>();
 const isBookingModalOpen = ref(false);
+const isBookingParticipantModalOpen = ref(false);
 
 const columns = computed(() =>
   defaultColumns.filter((column) => selectedColumns.value.includes(column)),
@@ -160,8 +186,11 @@ const loadData = async () => {
       query,
     },
   );
-  if (bookingsFromDb.value?.success && bookingsFromDb.value?.data)
+  if (bookingsFromDb.value?.success && bookingsFromDb.value?.data) {
+    console.log(bookingsFromDb.value);
     bookings.value = bookingsFromDb.value.data;
+  }
+
   loading.value = false;
 };
 

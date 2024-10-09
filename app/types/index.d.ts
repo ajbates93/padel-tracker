@@ -17,12 +17,24 @@ export interface Booking {
   id: number;
   date: Date;
   status: string;
-  created_at: Date;
-  updated_at: Date;
   user_id: string;
   user: User;
   time: string;
   duration: number;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
+}
+
+export interface BookingParticipant {
+  id: number;
+  booking_id: number;
+  user_id: string;
+  user: User;
+  paid: boolean;
+  created_at: Date;
+  updated_at: Date;
+  deleted_at: Date | null;
 }
 
 export type BookingDuration = 60 | 90;
@@ -37,5 +49,6 @@ export interface Range {
 
 export type ApiResponse<T> = {
   success: boolean;
-  data: T;
+  data?: T;
+  error?: string;
 };

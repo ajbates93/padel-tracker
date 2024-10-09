@@ -58,6 +58,7 @@
 
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "#ui/types";
+import type { ApiResponse } from "~/types";
 
 type FormState = {
   date: Date;
@@ -115,12 +116,6 @@ function generateTimeOptions() {
 
 const timeOptions = computed(() => generateTimeOptions());
 
-type ApiResponse = {
-  success: boolean;
-  data?: any;
-  error?: string;
-};
-
 async function onSubmit(event: FormSubmitEvent<any>) {
   loading.value = true;
 
@@ -131,7 +126,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   const method = props.isEditing ? "PUT" : "POST";
 
   try {
-    const response: ApiResponse = await $fetch(endpoint, {
+    const response: ApiResponse<Booking[]> = await $fetch(endpoint, {
       method,
       body: JSON.stringify(event.data),
     });

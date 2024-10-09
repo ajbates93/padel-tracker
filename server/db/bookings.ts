@@ -85,10 +85,7 @@ export const getAllBookings = async (params: {
 
   const response = mapQueryResultToResponse(results);
 
-  return {
-    success: true,
-    data: response,
-  };
+  return response;
 };
 
 type QueryResult = {

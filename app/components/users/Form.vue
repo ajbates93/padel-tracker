@@ -50,6 +50,7 @@
 
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "#ui/types";
+import type { ApiResponse } from "~/types";
 
 type FormState = {
   name: string;
@@ -92,12 +93,6 @@ const validate = (state: FormState): FormError[] => {
   return errors;
 };
 
-type ApiResponse = {
-  success: boolean;
-  data?: any;
-  error?: string;
-};
-
 async function onSubmit(event: FormSubmitEvent<any>) {
   loading.value = true;
 
@@ -108,7 +103,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   const method = props.isEditing ? "PUT" : "POST";
 
   try {
-    const response: ApiResponse = await $fetch(endpoint, {
+    const response: ApiResponse<User[]> = await $fetch(endpoint, {
       method,
       body: JSON.stringify(event.data),
     });

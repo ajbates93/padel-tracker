@@ -9,6 +9,20 @@ export default defineEventHandler(async (event) => {
     paid,
   };
 
+  if (!newBookingParticipant.user_id) {
+    return {
+      success: false,
+      error: "User ID is required.",
+    };
+  }
+
+  if (!newBookingParticipant.booking_id) {
+    return {
+      success: false,
+      error: "Booking ID is required.",
+    };
+  }
+
   const response = createBookingParticipant(newBookingParticipant);
 
   if (response) {
