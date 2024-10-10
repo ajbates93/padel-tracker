@@ -11,10 +11,10 @@
       <UPopover :popper="{ placement: 'bottom-start' }">
         <UButton
           icon="i-heroicons-calendar-days-20-solid"
-          :label="date.toLocaleDateString()"
+          :label="state.date.toLocaleDateString()"
         />
         <template #panel="{ close }">
-          <DatePicker v-model="date" is-required @close="close" />
+          <DatePicker v-model="state.date" is-required @close="close" />
         </template>
       </UPopover>
     </div>
@@ -78,8 +78,6 @@ const props = defineProps<{
     status: string;
   };
 }>();
-
-const date = ref(new Date());
 
 const state = reactive<FormState>({
   date: props.editingBooking?.date ?? new Date(),

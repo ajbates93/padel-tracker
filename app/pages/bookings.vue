@@ -24,14 +24,22 @@
     </template>
     <UDashboardToolbar>
       <template #left>
-        <USelectMenu
-          v-model="selectedStatuses"
-          icon="i-heroicons-check-circle"
-          placeholder="Status"
-          multiple
-          :options="defaultStatuses"
-          :ui-menu="{ option: { base: 'capitalize' } }"
-        />
+        <div class="flex items-center gap-5">
+          <USelectMenu
+            v-model="selectedStatuses"
+            icon="i-heroicons-check-circle"
+            placeholder="Status"
+            multiple
+            :options="defaultStatuses"
+            :ui-menu="{ option: { base: 'capitalize' } }"
+          />
+          <UToggle id="pastBookings" v-model="displayPastBookings" />
+          <label
+            class="hover cursor-pointer select-none text-sm"
+            for="pastBookings"
+            >Show previous bookings</label
+          >
+        </div>
       </template>
     </UDashboardToolbar>
     <UDashboardModal
@@ -237,12 +245,15 @@ const isBookingParticipantModalOpen = ref(false);
 const isEditingBookingParticipantModalOpen = ref(false);
 const isRemoveBookingParticipantModalOpen = ref(false);
 
+const displayPastBookings = ref(false);
+
 const columns = computed(() =>
   defaultColumns.filter((column) => selectedColumns.value.includes(column)),
 );
 
 const query = computed(() => ({
   q: q.value,
+  where: displayPastBookings.value ? "all" : "future",
   statuses: selectedStatuses.value,
   sort: sort.value.column,
   order: sort.value.direction,
@@ -293,6 +304,14 @@ function handleEditParticipant(
 }
 
 loadData();
+
+watch(
+  [q, displayPastBookings, selectedStatuses, sort, displayPastBookings],
+  loadData,
+  {
+    deep: true,
+  },
+);
 
 defineShortcuts({
   "/": () => input.value?.input?.focus(),

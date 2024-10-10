@@ -1,7 +1,7 @@
 import type { BookingStatus } from "~/types";
 import type { PgSelect } from "drizzle-orm/pg-core";
 import { bookingParticipants, bookings, users } from "./schema";
-import { and, eq, desc, asc, ilike, aliasedTable } from "drizzle-orm";
+import { and, eq, desc, asc, ilike, aliasedTable, lte, gt } from "drizzle-orm";
 
 const db = useDrizzle();
 
@@ -10,14 +10,16 @@ const participantUsers = aliasedTable(users, "participant_users");
 
 export const getAllBookings = async (params: {
   q?: string;
+  where: "future" | "all";
   statuses?: BookingStatus[];
   sort?: "date" | "user_id";
   order?: "asc" | "desc";
   page?: number;
   pageSize?: number;
 }) => {
-  const { q, statuses, sort, order, page, pageSize } = params;
+  const { q, where, statuses, sort, order, page, pageSize } = params;
 
+  console.log(where);
   let query = db
     .select({
       booking: {
@@ -53,6 +55,7 @@ export const getAllBookings = async (params: {
       },
     })
     .from(bookings)
+    .where(gt(bookings.date, new Date()).if(where === "future"))
     .leftJoin(users, eq(bookings.user_id, users.id))
     .leftJoin(
       bookingParticipants,
@@ -63,6 +66,10 @@ export const getAllBookings = async (params: {
       eq(bookingParticipants.user_id, participantUsers.id),
     )
     .$dynamic();
+
+  //if (where === "future") {
+  //  query = query.where(gt(bookings.date, new Date()));
+  //}
 
   // Apply search filter
   if (q) {
