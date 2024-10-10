@@ -2,6 +2,15 @@ import { bookingParticipants } from "./schema";
 
 const db = useDrizzle();
 
+export const getBookingParticipantById = async (id: number) => {
+  const bookingParticipant = await db
+    .select()
+    .from(tables.bookingParticipants)
+    .where(eq(tables.bookingParticipants.id, id));
+
+  return bookingParticipant;
+};
+
 export const createBookingParticipant = async (bookingParticipantInput: {
   user_id: string;
   booking_id: number;

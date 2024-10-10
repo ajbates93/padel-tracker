@@ -63,7 +63,7 @@
     >
       <BookingsParticipantsForm
         :bookingId="selected[0]!.id"
-        @close="isBookingParticipantModalOpen = false"
+        @close="isEditingBookingParticipantModalOpen = false"
         @reload-data="loadData"
         :is-editing="true"
         :editing-booking-participant="{
@@ -200,7 +200,7 @@ const participantActions = (row: any) => [
     {
       label: "Edit",
       icon: "i-heroicons-pencil-20-solid",
-      onClick: () => {
+      click: () => {
         handleEditParticipant(row.id, row.user.id, row.paid);
       },
     },
@@ -209,7 +209,7 @@ const participantActions = (row: any) => [
     {
       label: "Remove",
       icon: "i-heroicons-trash-20-solid",
-      onClick: () => {
+      click: () => {
         isRemoveBookingParticipantModalOpen.value = true;
       },
     },
@@ -289,7 +289,7 @@ function handleEditParticipant(
     userId: userId,
     paid,
   };
-  isBookingParticipantModalOpen.value = true;
+  isEditingBookingParticipantModalOpen.value = true;
 }
 
 loadData();
