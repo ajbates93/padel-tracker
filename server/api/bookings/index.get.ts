@@ -12,8 +12,6 @@ export default defineEventHandler(async (event) => {
 
   const bookings = await getAllBookings({ q, where, statuses, sort, order });
 
-  console.log(bookings);
-
   const response = {
     success: true,
     data: bookings,

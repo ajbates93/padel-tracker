@@ -25,19 +25,18 @@
     <UDashboardToolbar>
       <template #left>
         <div class="flex items-center gap-5">
-          <USelectMenu
+          <USelect
             v-model="selectedStatuses"
             icon="i-heroicons-check-circle"
             placeholder="Status"
-            multiple
-            :options="defaultStatuses"
+            :options="statusOptions"
             :ui-menu="{ option: { base: 'capitalize' } }"
           />
           <UToggle id="pastBookings" v-model="displayPastBookings" />
           <label
             class="hover cursor-pointer select-none text-sm"
             for="pastBookings"
-            >Show previous bookings</label
+            >Include Previous Bookings</label
           >
         </div>
       </template>
@@ -274,12 +273,21 @@ const loadData = async () => {
   loading.value = false;
 };
 
-const defaultStatuses = bookings.value.reduce((acc, booking) => {
-  if (!acc.includes(booking.status)) {
-    acc.push(booking.status);
-  }
-  return acc;
-}, [] as string[]);
+//const defaultStatuses = computed(() =>
+//  bookings.value.reduce((acc, booking) => {
+//    if (!acc.includes(booking.status)) {
+//      acc.push(booking.status);
+//    }
+//    return acc;
+//  }, [] as string[]),
+//);
+
+const statusOptions = [
+  { value: "", label: "All" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "pending", label: "Pending" },
+  { value: "cancelled", label: "Cancelled" },
+];
 
 function onSelect(row: Booking) {
   const index = selected.value.findIndex((booking) => booking.id === row.id);

@@ -19,7 +19,6 @@ export const getAllBookings = async (params: {
 }) => {
   const { q, where, statuses, sort, order, page, pageSize } = params;
 
-  console.log(where);
   let query = db
     .select({
       booking: {
@@ -76,11 +75,16 @@ export const getAllBookings = async (params: {
     query = query.where(ilike(users.name, `%${q}%`));
   }
 
-  // Apply status filter
-  if (statuses && statuses.length > 0) {
-    query = query.where(
-      and(...statuses.map((status) => eq(bookings.status, status))),
-    );
+  console.log(statuses);
+
+  if (statuses) {
+    // Apply status filter
+    const statusArray = Array.isArray(statuses) ? statuses : [statuses];
+    if (statusArray.length > 0) {
+      query = query.where(
+        and(...statusArray.map((status) => eq(bookings.status, status!))),
+      );
+    }
   }
 
   // Apply sorting
