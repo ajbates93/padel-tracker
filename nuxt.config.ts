@@ -10,8 +10,10 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@nuxtjs/google-fonts",
     "@vueuse/nuxt",
+    "@nuxtjs/supabase",
   ],
   colorMode: {
     preference: "dark",
   },
 });
+
