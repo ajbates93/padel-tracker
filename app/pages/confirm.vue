@@ -1,5 +1,11 @@
 <template>
-  <div>Waiting for login...</div>
+  <div
+    class="mt-[-100px] w-screen h-screen flex justify-center items-center p-20 align-middle"
+  >
+    <div>
+      Check your email inbox. You should have received a magic link to sign in.
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 const user = useSupabaseUser();

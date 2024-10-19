@@ -7,9 +7,7 @@
     >
       <UDashboardNavbar>
         <template #left>
-          <div class="text-2xl font-bold flex items-center">
-            <UIcon name="i-heroicons-calendar-days" class="mr-2" />Padel Tracker
-          </div>
+          <Logo />
         </template>
       </UDashboardNavbar>
       <UDashboardSidebar>

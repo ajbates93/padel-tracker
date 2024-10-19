@@ -44,6 +44,8 @@
 </template>
 
 <script setup lang="ts">
+const supabase = useSupabaseClient();
+
 const items = computed(() => {
   return [
     [
@@ -60,6 +62,20 @@ const items = computed(() => {
         to: "/settings",
       },
     ],
+    [
+      {
+        label: "Sign Out",
+        icon: "i-heroicons-arrow-left-end-on-rectangle",
+        click: () => {
+          handleSignOutClick();
+        },
+      },
+    ],
   ];
 });
+
+const handleSignOutClick = async () => {
+  await supabase.auth.signOut();
+  navigateTo("/");
+};
 </script>
