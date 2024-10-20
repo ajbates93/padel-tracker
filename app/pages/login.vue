@@ -2,15 +2,17 @@
   <div
     class="mt-[-100px] w-screen h-screen flex justify-center items-center p-20 align-middle"
   >
-    <UAuthForm
-      title="Sign in"
-      description="Enter your email to receive a magic link in your inbox."
-      icon="i-heroicons-user-circle"
-      :validate="validate"
-      :loading="false"
-      :fields="fields"
-      @submit="onSubmit"
-    />
+    <div class="border p-10 rounded-lg border-primary/20">
+      <UAuthForm
+        title="Sign in"
+        description="Enter your email to receive a magic link in your inbox."
+        icon="i-heroicons-user-circle"
+        :validate="validate"
+        :loading="false"
+        :fields="fields"
+        @submit="onSubmit"
+      />
+    </div>
   </div>
 </template>
 
@@ -52,7 +54,7 @@ const signInWithOtp = async () => {
   const { error } = await supabase.auth.signInWithOtp({
     email: email.value,
     options: {
-      emailRedirectTo: "http://localhost:3000/",
+      emailRedirectTo: "http://localhost:3000/confirm",
     },
   });
   if (!error) {
