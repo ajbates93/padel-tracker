@@ -1,4 +1,4 @@
-defmodule ServerWeb.UserJson do
+defmodule ServerWeb.UserJSON do
   alias Server.Users.User
 
   def index(%{users: users}) do
