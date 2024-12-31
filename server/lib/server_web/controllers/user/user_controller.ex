@@ -1,6 +1,8 @@
 defmodule ServerWeb.UserController do
   use ServerWeb, :controller
 
+  # Handlers
+
   def index(conn, params) do
     %{"q" => query, "statuses" => statuses, "sort" => sort, "order" => order} = params
 
@@ -50,7 +52,8 @@ defmodule ServerWeb.UserController do
     end
   end
 
-  # Helper functions
+  # Helpers
+
   defp filter_by_search(users, nil), do: users
 
   defp filter_by_search(users, query) do

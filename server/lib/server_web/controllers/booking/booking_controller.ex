@@ -1,13 +1,13 @@
 defmodule ServerWeb.BookingController do
+  require Logger
   use ServerWeb, :controller
+
+  # Handlers
 
   def index(conn, params) do
     bookings = Server.Bookings.list_bookings(params)
 
-    json(conn, %{
-      success: true,
-      data: bookings
-    })
+    render(conn, :index, bookings: bookings)
   end
 
   def create(conn, %{"date" => date, "time" => time, "duration" => duration} = params) do
@@ -16,24 +16,22 @@ defmodule ServerWeb.BookingController do
       time: time,
       duration: duration,
       status: Map.get(params, "status", "pending"),
-      user_id: "b28ea0f9-10de-4a97-8642-667b8c68cb65" # TODO: remove hardcoded ID
+      user_id: 1
     }
 
     case Server.Bookings.create_booking(booking_params) do
       {:ok, booking} ->
-        json(conn, %{
-          success: true,
-          data: booking
-        })
-      {:error, _changeset} ->
+        conn
+        |> put_status(:created)
+        |> render(:create, booking: booking)
+
+      {:error, changeset} ->
+        Logger.error("Booking creation failed.")
+        IO.inspect(changeset.errors, label: "Changeset Errors")
+
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{
-          success: false,
-          error: "Could not create new booking."
-        })
+        |> render(:error, message: "Could not create new booking")
     end
   end
-
-  # Helper functions similar to UserController...
 end

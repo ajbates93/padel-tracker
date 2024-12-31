@@ -33,6 +33,7 @@ defmodule ServerWeb.Router do
     post "/bookings", BookingController, :create
 
     # Booking Participants
+    get "/booking_participants", BookingParticipantController, :index
     post "/booking_participants", BookingParticipantController, :create
     put "/booking_participants/:id", BookingParticipantController, :update
   end
